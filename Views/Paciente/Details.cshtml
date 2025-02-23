@@ -1,0 +1,47 @@
+@model SystemOdonto.Models.Paciente
+
+@{
+    ViewData["Title"] = "Detalles del Paciente";
+}
+
+<h2 class="text-center">Detalles del Paciente</h2>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Nombre)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Nombre)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Direccion)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Direccion)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Telefono)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Telefono)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PagoInicial)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PagoInicial)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Mensualidad)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Mensualidad)
+        </dd>
+    </dl>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>

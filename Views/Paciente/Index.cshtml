@@ -1,0 +1,41 @@
+@model IEnumerable<SystemOdonto.Models.Paciente>
+
+@{
+    ViewData["Title"] = "Lista de Pacientes";
+}
+
+<h2 class="text-center">Lista de Pacientes</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Agregar Paciente</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Pago Inicial</th>
+            <th>Mensualidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var paciente in Model)
+        {
+            <tr>
+                <td>@paciente.Nombre</td>
+                <td>@paciente.Direccion</td>
+                <td>@paciente.Telefono</td>
+                <td>@paciente.PagoInicial.ToString("C")</td>
+                <td>@paciente.Mensualidad.ToString("C")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@paciente.Id" class="btn btn-info btn-sm">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@paciente.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@paciente.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
