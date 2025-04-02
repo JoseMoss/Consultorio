@@ -1,0 +1,28 @@
+@model SystemOdonto.Models.Paciente
+
+@{
+    ViewData["Title"] = "Detalles del Paciente";
+}
+
+<h2 class="text-center">Detalles del Paciente</h2>
+
+<!-- 🔍 Depuración: Ver cuántos tratamientos adicionales tiene el paciente -->
+<p>Tratamientos Adicionales: @Model.TratamientosAdicionales?.Count()</p>
+<pre>@Html.Raw(Json.Serialize(Model.TratamientosAdicionales))</pre>
+
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>@Html.DisplayNameFor(model => model.Nombre)</dt>
+        <dd>@Html.DisplayFor(model => model.Nombre)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Direccion)</dt>
+        <dd>@Html.DisplayFor(model => model.Direccion)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Telefono)</dt>
+        <dd>@Html.DisplayFor(model => model.Telefono)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.TipoTratamiento)</dt>
+        <dd>@Html.DisplayFor(model => model.TipoTratamiento)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.FechaInicioTratamiento)</

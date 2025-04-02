@@ -1,0 +1,81 @@
+@model SystemOdonto.Models.Paciente
+
+@{
+    ViewData["Title"] = "Eliminar Paciente";
+}
+
+<h2 class="text-center">Eliminar Paciente</h2>
+
+<h3>¿Estás seguro de que quieres eliminar este paciente?</h3>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>@Html.DisplayNameFor(model => model.Nombre)</dt>
+        <dd>@Html.DisplayFor(model => model.Nombre)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Direccion)</dt>
+        <dd>@Html.DisplayFor(model => model.Direccion)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Telefono)</dt>
+        <dd>@Html.DisplayFor(model => model.Telefono)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.TipoTratamiento)</dt>
+        <dd>@Html.DisplayFor(model => model.TipoTratamiento)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.FechaInicioTratamiento)</dt>
+        <dd>@Html.DisplayFor(model => model.FechaInicioTratamiento)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.PagoInicial)</dt>
+        <dd>@Html.DisplayFor(model => model.PagoInicial)</dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Mensualidad)</dt>
+        <dd>@Html.DisplayFor(model => model.Mensualidad)</dd>
+    </dl>
+
+    @if (Model.TratamientosAdicionales != null && Model.TratamientosAdicionales.Any())
+    {
+        <h4>Tratamientos Adicionales</h4>
+        <ul class="list-group">
+            @foreach (var tratamiento in Model.TratamientosAdicionales)
+            {
+                <li class="list-group-item">
+                    <strong>@tratamiento.Nombre</strong> - Costo: $@tratamiento.Costo
+                </li>
+            }
+        </ul>
+        
+        <!-- Campo para mostrar el costo total de los tratamientos adicionales -->
+        <div class="form-group mt-3">
+            <label><strong>Costo Total de Tratamientos Adicionales</strong></label>
+            <input type="text" id="totalAdicional" class="form-control" readonly value="0.00" />
+        </div>
+    }
+    else
+    {
+        <p>No hay tratamientos adicionales registrados.</p>
+    }
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Calcular costo total de tratamientos adicionales al cargar la vista
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                let costoTexto = item.textContent.match(/\$(\d+\.?\d*)/);
+                if (costoTexto) {
+                    total += parseFloat(costoTexto[1]) || 0;
+                }
+            });
+            document.getElementById('totalAdicional').value = total.toFixed(2);
+        }
+        
+        calcularTotal();
+    </script>
+}

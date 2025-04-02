@@ -1,0 +1,119 @@
+@model SystemOdonto.Models.Paciente
+
+@{
+    ViewData["Title"] = "Crear Paciente";
+}
+
+<h2 class="text-center">Crear Paciente</h2>
+
+<form asp-action="Create" method="post">
+    <!-- Campos del Paciente -->
+    <div class="form-group">
+        <label asp-for="Nombre" class="control-label"></label>
+        <input asp-for="Nombre" class="form-control" required />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Direccion" class="control-label"></label>
+        <input asp-for="Direccion" class="form-control" required />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telefono" class="control-label"></label>
+        <input asp-for="Telefono" class="form-control" required />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TipoTratamiento"></label>
+        <input asp-for="TipoTratamiento" class="form-control" required />
+        <span asp-validation-for="TipoTratamiento" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaInicioTratamiento"></label>
+        <input asp-for="FechaInicioTratamiento" type="date" class="form-control" required />
+        <span asp-validation-for="FechaInicioTratamiento" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PagoInicial" class="control-label"></label>
+        <input asp-for="PagoInicial" type="number" class="form-control" required />
+        <span asp-validation-for="PagoInicial" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Mensualidad" class="control-label"></label>
+        <input asp-for="Mensualidad" type="number" class="form-control" required />
+        <span asp-validation-for="Mensualidad" class="text-danger"></span>
+    </div>
+
+    <!-- Sección de Tratamientos Adicionales -->
+    <h4>Tratamientos Adicionales</h4>
+    <div id="tratamientos-container">
+        @if (Model.TratamientosAdicionales != null && Model.TratamientosAdicionales.Any())
+        {
+            for (int i = 0; i < Model.TratamientosAdicionales.Count; i++)
+            {
+                <div class="tratamiento-adicional mb-2">
+                    <input type="text" name="TratamientosAdicionales[@i].Nombre" class="form-control" placeholder="Nombre del tratamiento" value="@Model.TratamientosAdicionales[i].Nombre" required />
+                    <input type="number" name="TratamientosAdicionales[@i].Costo" class="form-control cost-field" placeholder="Costo" value="@Model.TratamientosAdicionales[i].Costo" required oninput="recalcularTotal()" />
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeTreatment(this)">Eliminar</button>
+                </div>
+            }
+        }
+    </div>
+
+    <button type="button" class="btn btn-primary my-2" id="addTreatment">Agregar Tratamiento</button>
+
+    <div class="form-group">
+        <label>Costo Total de Tratamientos Adicionales</label>
+        <input type="text" id="totalAdicional" class="form-control" readonly value="0.00" />
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function recalcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.cost-field').forEach(function (input) {
+                let valor = parseFloat(input.value) || 0;
+                total += valor;
+            });
+            document.getElementById('totalAdicional').value = total.toFixed(2);
+        }
+
+        document.getElementById("addTreatment").addEventListener("click", function () {
+            let container = document.getElementById("tratamientos-container");
+            let index = container.children.length;
+
+            let div = document.createElement("div");
+            div.classList.add("tratamiento-adicional", "mb-2");
+
+            div.innerHTML = `
+                <input type="text" name="TratamientosAdicionales[${index}].Nombre" class="form-control" placeholder="Nombre del tratamiento" required />
+                <input type="number" name="TratamientosAdicionales[${index}].Costo" class="form-control cost-field" placeholder="Costo" required oninput="recalcularTotal()" />
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeTreatment(this)">Eliminar</button>
+            `;
+
+            container.appendChild(div);
+            recalcularTotal();
+        });
+
+        function removeTreatment(button) {
+            button.parentElement.remove();
+            recalcularTotal();
+        }
+
+        recalcularTotal();
+    </script>
+}
