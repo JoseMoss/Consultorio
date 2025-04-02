@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace SystemOdonto.Models
@@ -27,17 +28,18 @@ namespace SystemOdonto.Models
         [Range(0, double.MaxValue, ErrorMessage = "La mensualidad no puede ser negativa")]
         public decimal Mensualidad { get; set; }
 
-        [Required]
-        public required string TipoTratamiento { get; set; } 
+        [Required(ErrorMessage = "El tipo de tratamiento es obligatorio")]
+        public string TipoTratamiento { get; set; } = string.Empty;  
 
+        [Required(ErrorMessage = "La fecha de inicio del tratamiento es obligatoria")]
         [DataType(DataType.Date)]
         public DateTime FechaInicioTratamiento { get; set; }
 
-        // ✅ Relación con TratamientoAdicional
-        public List<TratamientoAdicional> TratamientosAdicionales { get; set; } = new List<TratamientoAdicional>();
+        // Relación con TratamientoAdicional
+        public virtual List<TratamientoAdicional> TratamientosAdicionales { get; set; } = new List<TratamientoAdicional>();
 
-        // ✅ Propiedad calculada para obtener el costo total de tratamientos adicionales
-        public decimal CostoTotalTratamientosAdicionales => TratamientosAdicionales.Sum(t => t.Costo);
+        // Propiedad calculada para obtener el costo total de tratamientos adicionales
+        [NotMapped] // No se guarda en la base de datos
+        public decimal CostoTotalTratamientosAdicionales => TratamientosAdicionales?.Sum(t => t.Costo) ?? 0;
     }
 }
-

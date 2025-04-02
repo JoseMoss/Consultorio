@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SystemOdonto.Models;
 
 namespace SystemOdonto.Controllers
@@ -14,14 +16,12 @@ namespace SystemOdonto.Controllers
             _context = context;
         }
 
-        // 1️⃣ LISTAR PACIENTES
         public IActionResult Index()
         {
-            var pacientes = _context.Pacientes.ToList();
+            var pacientes = _context.Pacientes.Include(p => p.TratamientosAdicionales).ToList();
             return View(pacientes);
         }
 
-        // 2️⃣ CREAR PACIENTE - FORMULARIO
         public IActionResult Create()
         {
             return View(new Paciente
@@ -31,7 +31,6 @@ namespace SystemOdonto.Controllers
             });
         }
 
-        // 3️⃣ CREAR PACIENTE - GUARDAR EN BD
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Paciente paciente)
@@ -45,10 +44,12 @@ namespace SystemOdonto.Controllers
             return View(paciente);
         }
 
-        // 4️⃣ EDITAR PACIENTE - FORMULARIO
         public IActionResult Edit(int id)
         {
-            var paciente = _context.Pacientes.Find(id);
+            var paciente = _context.Pacientes
+                .Include(p => p.TratamientosAdicionales)
+                .FirstOrDefault(p => p.Id == id);
+
             if (paciente == null)
             {
                 return NotFound();
@@ -56,7 +57,6 @@ namespace SystemOdonto.Controllers
             return View(paciente);
         }
 
-        // 5️⃣ EDITAR PACIENTE - GUARDAR CAMBIOS
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Paciente paciente)
@@ -68,25 +68,72 @@ namespace SystemOdonto.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Pacientes.Update(paciente);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    var pacienteExistente = _context.Pacientes
+                        .Include(p => p.TratamientosAdicionales)
+                        .FirstOrDefault(p => p.Id == id);
+
+                    if (pacienteExistente == null)
+                    {
+                        return NotFound();
+                    }
+
+                    pacienteExistente.Nombre = paciente.Nombre;
+                    pacienteExistente.Direccion = paciente.Direccion;
+                    pacienteExistente.Telefono = paciente.Telefono;
+                    pacienteExistente.TipoTratamiento = paciente.TipoTratamiento;
+                    pacienteExistente.FechaInicioTratamiento = paciente.FechaInicioTratamiento;
+                    pacienteExistente.PagoInicial = paciente.PagoInicial;
+                    pacienteExistente.Mensualidad = paciente.Mensualidad;
+
+                    pacienteExistente.TratamientosAdicionales.Clear();
+                    foreach (var tratamiento in paciente.TratamientosAdicionales)
+                    {
+                        pacienteExistente.TratamientosAdicionales.Add(new TratamientoAdicional
+                        {
+                            Nombre = tratamiento.Nombre,
+                            Costo = tratamiento.Costo
+                        });
+                    }
+
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Pacientes.Any(e => e.Id == paciente.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
             return View(paciente);
         }
 
-        // 6️⃣ DETALLES DE UN PACIENTE
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
-            var paciente = _context.Pacientes.Find(id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var paciente = await _context.Pacientes
+                .Include(p => p.TratamientosAdicionales)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (paciente == null)
             {
                 return NotFound();
             }
+
             return View(paciente);
         }
 
-        // 7️⃣ ELIMINAR PACIENTE - CONFIRMACIÓN
         public IActionResult Delete(int id)
         {
             var paciente = _context.Pacientes.Find(id);
@@ -97,7 +144,6 @@ namespace SystemOdonto.Controllers
             return View(paciente);
         }
 
-        // 8️⃣ ELIMINAR PACIENTE - CONFIRMAR Y BORRAR
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -112,3 +158,5 @@ namespace SystemOdonto.Controllers
         }
     }
 }
+
+

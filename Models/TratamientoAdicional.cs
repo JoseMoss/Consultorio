@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SystemOdonto.Models
 {
-    [Table("TratamientosAdicionales")]  // Esto indica el nombre exacto de la tabla en la base de datos
+    [Table("TratamientosAdicionales")]  
     public class TratamientoAdicional
     {
         [Key]
@@ -15,9 +15,11 @@ namespace SystemOdonto.Models
         [Range(0, double.MaxValue, ErrorMessage = "El costo debe ser un valor positivo")]
         public decimal Costo { get; set; }
 
-        // Clave foránea para relacionar con Paciente
+        // Clave foránea
+        [ForeignKey("Paciente")]
         public int PacienteId { get; set; }
 
-        public Paciente? Paciente { get; set; }  // Relación de navegación (opcional)
+        // Relación de navegación asegurando la carga
+        public virtual Paciente Paciente { get; set; } = null!;
     }
 }
